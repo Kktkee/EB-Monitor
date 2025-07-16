@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - EB Monitor</title>
+  <link rel="stylesheet" href="/css/login.css">
+
+</head>
+<body class="login-body">
+  <!-- Animated particles -->
+  <div class="particles" id="particles"></div>
+
+  <div class="glass-card">
+    <div class="form-header">
+      <h2 class="form-title">Login</h2>
+      <p class="form-subtitle">Welcome back to EB Monitor</p>
+    </div>
+
+    <form action="/login" method="POST" id="loginForm">
+      <div class="input-group email">
+        <input type="email" name="email" placeholder=" " required>
+        <label>Email Address</label>
+      </div>
+
+      <div class="input-group password">
+        <input type="password" name="password" placeholder=" " required>
+        <label>Password</label>
+      </div>
+
+      <button type="submit" class="login-btn">
+        <span class="loading" id="loading"></span>
+        <span id="btnText">Login</span>
+      </button>
+    </form>
+
+    <a class="forgot-password" href="#">Forgot Password?</a>
+
+    <div class="form-links">
+      <span style="color: rgba(255, 255, 255, 0.6);">Don't have an account?</span>
+      <a href="/signup">Sign up here</a>
+    </div>
+  </div>
+
+  <footer>Copyright Ⓒ 2025 EB Monitor - All rights reserved</footer>
+
+  <script>
+    // Create animated particles
+    function createParticles() {
+      const particlesContainer = document.getElementById('particles');
+      const particleCount = 30;
+
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 15 + 's';
+        particle.style.animationDuration = (Math.random() * 8 + 12) + 's';
+        particlesContainer.appendChild(particle);
+      }
+    }
+
+    // Form functionality
+    const form = document.getElementById('loginForm');
+    const loading = document.getElementById('loading');
+    const btnText = document.getElementById('btnText');
+
+    // Add input animations
+    document.querySelectorAll('input').forEach(input => {
+      input.addEventListener('focus', () => {
+        input.parentElement.style.transform = 'translateY(-2px)';
+        input.parentElement.style.transition = 'transform 0.3s ease';
+      });
+      
+      input.addEventListener('blur', () => {
+        input.parentElement.style.transform = 'translateY(0)';
+      });
+
+      // Add typing effect
+      input.addEventListener('input', () => {
+        if (input.value) {
+          input.style.borderColor = '#4ecdc4';
+        } else {
+          input.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+        }
+      });
+    });
+
+    // Form submission with loading animation
+    form.addEventListener('submit', (e) => {
+      //e.preventDefault();
+      
+      // Show loading animation
+      loading.style.display = 'inline-block';
+      btnText.textContent = 'Logging in...';
+      
+      // Simulate login process
+      setTimeout(() => {
+        // Here you would normally submit the form
+        // form.submit();
+        console.log('Login form submitted');
+        
+        // Reset button after demo
+        loading.style.display = 'none';
+        btnText.textContent = 'Login';
+      }, 2000);
+    });
+
+    // Add shake animation on invalid input
+    function shakeInput(input) {
+      input.style.animation = 'shake 0.5s ease-in-out';
+      setTimeout(() => {
+        input.style.animation = '';
+      }, 500);
+    }
+
+    // Add shake keyframes
+    const shakeKeyframes = `
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+      }
+    `;
+    
+    const style = document.createElement('style');
+    style.textContent = shakeKeyframes;
+    document.head.appendChild(style);
+
+    // Validate inputs
+    document.querySelectorAll('input').forEach(input => {
+      input.addEventListener('blur', () => {
+        if (input.required && !input.value) {
+          shakeInput(input);
+        }
+      });
+    });
+
+    // Initialize particles on load
+    window.addEventListener('load', () => {
+      createParticles();
+    });
+
+    // Add ripple effect to button
+    const button = document.querySelector('.login-btn');
+    button.addEventListener('click', function(e) {
+      const ripple = document.createElement('span');
+      const rect = this.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      const x = e.clientX - rect.left - size / 2;
+      const y = e.clientY - rect.top - size / 2;
+      
+      ripple.style.cssText = `
+        position: absolute;
+        width: ${size}px;
+        height: ${size}px;
+        left: ${x}px;
+        top: ${y}px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        transform: scale(0);
+        animation: ripple 0.6s ease-out;
+        pointer-events: none;
+      `;
+      
+      this.appendChild(ripple);
+      
+      setTimeout(() => {
+        ripple.remove();
+      }, 600);
+    });
+
+    // Add ripple animation keyframes
+    const rippleKeyframes = `
+      @keyframes ripple {
+        to {
+          transform: scale(2);
+          opacity: 0;
+        }
+      }
+    `;
+    
+    const rippleStyle = document.createElement('style');
+    rippleStyle.textContent = rippleKeyframes;
+    document.head.appendChild(rippleStyle);
+  </script>
+</body>
+</html>

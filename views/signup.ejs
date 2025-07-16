@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signup - EB Monitor</title>
+  <link rel="stylesheet" href="/css/signup.css">
+
+
+</head>
+
+<body class="signup-body">
+  <!-- Animated particles -->
+  <div class="particles" id="particles"></div>
+
+  <div class="multi-step-form">
+    <div class="form-header">
+      <h1 class="form-title">Create Account</h1>
+      <p class="form-subtitle">Join EB Monitor and start saving on your electricity bills</p>
+    </div>
+
+    <div class="progress-bar">
+      <div class="progress-line">
+        <div class="progress-line-fill" id="progressFill"></div>
+      </div>
+      <div class="progress-step active" id="step1">1</div>
+      <div class="progress-step" id="step2">2</div>
+    </div>
+
+    <form action="/signup" method="POST" id="signupForm">
+      <div class="step active step-1" id="stepOne">
+        <div class="input-group">
+          <input name="name" type="text" placeholder=" " required>
+          <label>Full Name</label>
+        </div>
+        <div class="input-group">
+          <input name="email" type="email" placeholder=" " required>
+          <label>Email Address</label>
+        </div>
+      </div>
+
+      <div class="step step-2" id="stepTwo">
+        <div class="input-group">
+          <input name="password" type="password" placeholder=" " required>
+          <label>Password</label>
+        </div>
+        <div class="input-group">
+          <input name="confirm" type="password" placeholder=" " required>
+          <label>Confirm Password</label>
+        </div>
+      </div>
+
+      <div class="step step-3" id="stepThree" style="text-align: center;">
+        <div class="success-checkmark">✓</div>
+        <h2 style="color: white; margin-bottom: 1rem;">Account Created!</h2>
+        <p style="color: rgba(255, 255, 255, 0.8);">Welcome to EB Monitor. You can now start tracking your electricity
+          usage.</p>
+      </div>
+
+      <div class="form-navigation">
+        <button type="button" class="nav-btn prev" id="prevBtn" disabled>Previous</button>
+        <button type="button" class="nav-btn next" id="nextBtn">Next</button>
+        <button type="submit" class="nav-btn submit" id="submitBtn" style="display: none;">Create Account</button>
+      </div>
+    </form>
+  </div>
+
+  <footer>Copyright Ⓒ 2025 EB Monitor - All rights reserved</footer>
+
+  <script>
+    // Create animated particles
+    function createParticles() {
+      const particlesContainer = document.getElementById('particles');
+      const particleCount = 30;
+
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 15 + 's';
+        particle.style.animationDuration = (Math.random() * 8 + 12) + 's';
+        particlesContainer.appendChild(particle);
+      }
+    }
+
+    // Multi-step form functionality
+    let currentStep = 1;
+    const totalSteps = 2;
+
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const progressFill = document.getElementById('progressFill');
+    const form = document.getElementById('signupForm');
+
+    function updateProgress() {
+      const progress = ((currentStep - 1) / (totalSteps - 1)) * 100;
+      progressFill.style.width = progress + '%';
+
+      // Update step indicators
+      for (let i = 1; i <= totalSteps; i++) {
+        const stepEl = document.getElementById(`step${i}`);
+        if (i < currentStep) {
+          stepEl.classList.add('completed');
+          stepEl.classList.remove('active');
+          stepEl.innerHTML = '✓';
+        } else if (i === currentStep) {
+          stepEl.classList.add('active');
+          stepEl.classList.remove('completed');
+          stepEl.innerHTML = i;
+        } else {
+          stepEl.classList.remove('active', 'completed');
+          stepEl.innerHTML = i;
+        }
+      }
+    }
+
+    function showStep(step) {
+      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+      document.getElementById(`step${step === 1 ? 'One' : step === 2 ? 'Two' : 'Three'}`).classList.add('active');
+
+      // Update button visibility
+      prevBtn.disabled = step === 1;
+      prevBtn.style.display = step === 1 ? 'none' : 'block';
+
+      if (step === totalSteps) {
+        nextBtn.style.display = 'none';
+        submitBtn.style.display = 'block';
+      } else {
+        nextBtn.style.display = 'block';
+        submitBtn.style.display = 'none';
+      }
+    }
+
+    function validateStep(step) {
+      const stepEl = document.getElementById(`step${step === 1 ? 'One' : 'Two'}`);
+      const inputs = stepEl.querySelectorAll('input[required]');
+
+      for (let input of inputs) {
+        if (!input.value.trim()) {
+          input.focus();
+          return false;
+        }
+        if (input.name === 'email' && !input.value.includes('@')) {
+          input.focus();
+          return false;
+        }
+      }
+
+      if (step === 2) {
+        const password = stepEl.querySelector('input[name="password"]').value;
+        const confirm = stepEl.querySelector('input[name="confirm"]').value;
+        if (password !== confirm) {
+          stepEl.querySelector('input[name="confirm"]').focus();
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    nextBtn.addEventListener('click', () => {
+      if (validateStep(currentStep)) {
+        currentStep++;
+        showStep(currentStep);
+        updateProgress();
+      }
+    });
+
+    prevBtn.addEventListener('click', () => {
+      if (currentStep > 1) {
+        currentStep--;
+        showStep(currentStep);
+        updateProgress();
+      }
+    });
+
+    let isSubmitting = false;
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (isSubmitting) return;
+
+      if (validateStep(currentStep)) {
+        currentStep = 3;
+        showStep(currentStep);
+        updateProgress();
+        document.querySelector('.form-navigation').style.display = 'none';
+
+        isSubmitting = true; // prevent double submission
+
+        setTimeout(() => {
+          form.submit();
+        }, 2000);
+      }
+    });
+
+
+    // Add input animations
+    document.querySelectorAll('input').forEach(input => {
+      input.addEventListener('focus', () => {
+        input.parentElement.style.transform = 'translateY(-2px)';
+      });
+
+      input.addEventListener('blur', () => {
+        input.parentElement.style.transform = 'translateY(0)';
+      });
+    });
+
+    // Initialize
+    window.addEventListener('load', () => {
+      createParticles();
+      updateProgress();
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="/css/dashboard.css">
+
+</head>
+<body class="dashboard-body">
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-content">
+      <a href="#" class="logo">PowerTrack</a>
+      <ul class="nav-links">
+        <li><a href="/dashboard" class="active">Dashboard</a></li>
+        <li><a href="/dashboard/add-bill">Add Bill</a></li>
+        <li><a href="/bills">Bills</a></li>
+        <li><a href="/profile">Profile</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Dashboard Content -->
+  <main class="dashboard-container">
+    <!-- Welcome Section -->
+    <div class="welcome-section">
+      <h1 class="welcome-title">Welcome back, <span id="userName">John Doe</span>!</h1>
+      <p class="welcome-subtitle">Here's your electricity usage overview</p>
+    </div>
+
+    <!-- Summary Cards -->
+    <section class="summary-cards">
+      <div class="card">
+        <span class="card-icon">⚡</span>
+        <h3>This Month</h3>
+        <div class="card-value" id="currentMonthUnits">0</div>
+        <div class="card-label">units consumed</div>
+        <div class="card-amount">₹<span id="currentMonthAmount">0</span></div>
+      </div>
+      
+      <div class="card">
+        <span class="card-icon">📊</span>
+        <h3>Last Month</h3>
+        <div class="card-value" id="lastMonthUnits">0</div>
+        <div class="card-label">units consumed</div>
+        <div class="card-amount">₹<span id="lastMonthAmount">0</span></div>
+      </div>
+      
+      <div class="card">
+        <span class="card-icon">📈</span>
+        <h3>Average Daily</h3>
+        <div class="card-value" id="avgDaily">0</div>
+        <div class="card-label">units per day</div>
+        <div class="card-amount">₹<span id="avgDailyAmount">0</span></div>
+      </div>
+    </section>
+
+    <!-- Chart Section -->
+    <section class="chart-section">
+      <h2 class="chart-title">📊 Monthly Usage Trend</h2>
+      <div class="chart-container">
+        <canvas id="usageChart"></canvas>
+      </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <a href="/dashboard/add-bill" class="action-btn">
+        ➕ Add New Bill
+      </a>
+      <a href="/bills" class="action-btn">
+        📋 View All Bills
+      </a>
+    </div>
+
+    <!-- Additional Stats -->
+    <section class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-title">Total Bills</div>
+        <div class="stat-value" id="totalBills">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">Highest Usage</div>
+        <div class="stat-value" id="highestUsage">0 units</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">Lowest Usage</div>
+        <div class="stat-value" id="lowestUsage">0 units</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">Total Spent</div>
+        <div class="stat-value">₹<span id="totalSpent">0</span></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script id="dashboardData" type="application/json">
+  <%- JSON.stringify(dashboardData) %>
+  </script>
+
+  
+  <script>
+    // Sample data structure - replace with actual EJS data
+    const dashboardData = JSON.parse(document.getElementById('dashboardData').textContent);
+    console.log(dashboardData);
+    // Initialize dashboard
+    function initializeDashboard() {
+      // Update user name
+      document.getElementById('userName').textContent = dashboardData.user.name;
+      
+      // Update summary cards
+      updateSummaryCards();
+      
+      // Initialize chart
+      initializeChart();
+      
+      // Update stats
+      updateStats();
+    }
+
+    function updateSummaryCards() {
+      const { summary } = dashboardData;
+      
+      // Current month
+      animateValue('currentMonthUnits', 0, summary.currentMonth.units, 1000);
+      animateValue('currentMonthAmount', 0, summary.currentMonth.amount, 1000);
+      
+      // Last month
+      animateValue('lastMonthUnits', 0, summary.lastMonth.units, 1200);
+      animateValue('lastMonthAmount', 0, summary.lastMonth.amount, 1200);
+      
+      // Average daily
+      animateValue('avgDaily', 0, summary.avgDaily.units, 1400);
+      animateValue('avgDailyAmount', 0, summary.avgDaily.amount, 1400);
+    }
+
+    function updateStats() {
+      const { stats } = dashboardData;
+      
+      setTimeout(() => {
+        animateValue('totalBills', 0, stats.totalBills, 800);
+        animateValue('totalSpent', 0, stats.totalSpent, 1000);
+        document.getElementById('highestUsage').textContent = stats.highestUsage + ' units';
+        document.getElementById('lowestUsage').textContent = stats.lowestUsage + ' units';
+      }, 1500);
+    }
+
+    function animateValue(id, start, end, duration) {
+      const element = document.getElementById(id);
+      const range = end - start;
+      const startTime = Date.now();
+      
+      function updateValue() {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const easeProgress = 1 - Math.pow(1 - progress, 3); // Ease out cubic
+        const current = Math.round(start + (range * easeProgress));
+        
+        element.textContent = current;
+        
+        if (progress < 1) {
+          requestAnimationFrame(updateValue);
+        }
+      }
+      
+      requestAnimationFrame(updateValue);
+    }
+
+    function initializeChart() {
+      const ctx = document.getElementById('usageChart').getContext('2d');
+      
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: dashboardData.chart.labels,
+          datasets: [{
+            label: 'Units Consumed',
+            data: dashboardData.chart.data,
+            backgroundColor: 'rgba(78, 205, 196, 0.1)',
+            borderColor: 'rgba(78, 205, 196, 1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: 'rgba(78, 205, 196, 1)',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointRadius: 6,
+            pointHoverRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: 'rgba(255, 255, 255, 0.1)'
+              },
+              ticks: {
+                color: 'rgba(255, 255, 255, 0.7)'
+              }
+            },
+            x: {
+              grid: {
+                color: 'rgba(255, 255, 255, 0.1)'
+              },
+              ticks: {
+                color: 'rgba(255, 255, 255, 0.7)'
+              }
+            }
+          },
+          elements: {
+            point: {
+              hoverBackgroundColor: 'rgba(255, 107, 107, 1)'
+            }
+          }
+        }
+      });
+    }
+
+    // Initialize dashboard when page loads
+    document.addEventListener('DOMContentLoaded', initializeDashboard);
+
+    // Add refresh functionality
+    function refreshDashboard() {
+      // Show loading state
+      const cards = document.querySelectorAll('.card-value');
+      cards.forEach(card => {
+        card.innerHTML = '<div class="loading"></div>';
+      });
+      
+      // Simulate API call
+      setTimeout(() => {
+        initializeDashboard();
+      }, 1000);
+    }
+
+    // Auto-refresh every 5 minutes
+    setInterval(refreshDashboard, 300000);
+  </script>
+</body>
+</html>

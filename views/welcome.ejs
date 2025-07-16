@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Welcome</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/welcome.css">
+</head>
+<body>
+  <div class="animated-bg">
+    <div class="floating-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+      <div class="shape shape-4"></div>
+      <div class="shape shape-5"></div>
+    </div>
+  </div>
+  
+  <div class="welcome-container">
+    <div class="content-wrapper">
+      <div class="welcome-header">
+        <div class="avatar-container">
+          <div class="avatar">
+            <span class="avatar-emoji">👋</span>
+          </div>
+          <div class="pulse-ring"></div>
+        </div>
+        <h1 class="welcome-title">Welcome, <span class="name-highlight"><%= name %></span></h1>
+        <p class="welcome-subtitle">Ready to manage your finances with style?</p>
+      </div>
+      
+      <div class="button-group">
+        <a href="/dashboard" class="btn btn-primary">
+          <div class="btn-content">
+            <span class="btn-icon">📊</span>
+            <span class="btn-text">Go to Dashboard</span>
+          </div>
+          <div class="btn-shimmer"></div>
+        </a>
+        <a href="/add-bill" class="btn btn-secondary">
+          <div class="btn-content">
+            <span class="btn-icon">➕</span>
+            <span class="btn-text">Add Bill</span>
+          </div>
+          <div class="btn-shimmer"></div>
+        </a>
+      </div>
+      
+      <div class="stats-preview">
+        <div class="stat-card">
+          <div class="stat-value">$2,450</div>
+          <div class="stat-label">Monthly Budget</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">12</div>
+          <div class="stat-label">Active Bills</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">85%</div>
+          <div class="stat-label">Savings Goal</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

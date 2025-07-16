@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>All Bills - PowerTrack</title>
+  <link rel="stylesheet" href="/css/bills.css">
+
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-content">
+      <a href="/" class="logo">PowerTrack</a>
+      <ul class="nav-links">
+        <li><a href="/dashboard">Dashboard</a></li>
+        <li><a href="/add-bill">Add Bill</a></li>
+        <li><a href="/bills" class="active">Bills</a></li>
+        <li><a href="/profile">Profile</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="bills-container">
+    <h1 class="bills-title">📋 All Bills for <%= user ? user.name : 'User' %></h1>
+
+    <table class="bills-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Units</th>
+          <th>Rate (₹)</th>
+          <th>Amount (₹)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (!bills || bills.length === 0) { %>
+          <tr>
+            <td colspan="4" class="no-bills">No bills found. <a href="/add-bill">Add your first bill</a></td>
+          </tr>
+        <% } else { %>
+          <% bills.forEach(function(bill) { %>
+            <tr>
+              <td>
+                <% try { %>
+                  <%= bill.date ? new Date(bill.date).toLocaleDateString('en-IN') : 'Invalid Date' %>
+                <% } catch(e) { %>
+                  <%= bill.date || 'N/A' %>
+                <% } %>
+              </td>
+              <td><%= bill.units || 0 %></td>
+              <td class="currency">₹<%= bill.rate || 0 %></td>
+              <td class="currency">₹<%= bill.amount || 0 %></td>
+            </tr>
+          <% }); %>
+        <% } %>
+      </tbody>
+    </table>
+  </main>
+</body>
+</html>
